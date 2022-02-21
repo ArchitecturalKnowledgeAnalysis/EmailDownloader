@@ -13,34 +13,30 @@ import java.time.YearMonth;
  * Simple component that downloads a month of emails in Mbox format from the
  * apache mailing lists API.
  */
-public class Downloader {
+public class MboxDownloader {
 	private static final String BASE_URL = "https://lists.apache.org/api/mbox.lua";
 
 	private final HttpClient httpClient;
-	private final String domain;
-	private final String list;
 
 	/**
 	 * Constructs a new downloader.
-	 * @param list The mailing list name to download from.
-	 * @param domain The domain to download from.
 	 */
-	public Downloader(String list, String domain) {
+	public MboxDownloader() {
 		this.httpClient = HttpClient.newHttpClient();
-		this.domain = domain;
-		this.list = list;
 	}
 
 	/**
 	 * Downloads a Mbox file containing emails from the given period, to the
 	 * given file.
+	 * @param domain The domain to download the mbox file from.
+	 * @param list The name of the mailing list to download from.
 	 * @param file The file to place downloaded content in.
 	 * @param period The period to download emails for.
 	 * @throws IOException If an error occurs when downloading the emails.
 	 * @throws InterruptedException If the process is interrupted while waiting
 	 * for the download to complete.
 	 */
-	public void downloadMboxToFile(Path file, YearMonth period) throws IOException, InterruptedException {
+	public void downloadMboxToFile(String domain, String list, Path file, YearMonth period) throws IOException, InterruptedException {
 		HttpRequest request = HttpRequest.newBuilder(URI.create(BASE_URL + "?domain=" + domain + "&list=" + list + "&d=" + period))
 				.GET()
 				.timeout(Duration.ofSeconds(5))

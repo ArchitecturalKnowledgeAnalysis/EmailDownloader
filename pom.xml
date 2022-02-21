@@ -6,7 +6,7 @@
 
     <groupId>nl.andrewl</groupId>
     <artifactId>apache-email-downloader</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -31,7 +31,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>nl.andrewl.apache_email_downloader.ApacheEmailDownloader</mainClass>
+                            <mainClass>nl.andrewl.apache_email_downloader.ApacheEmailDownloaderCommand</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
