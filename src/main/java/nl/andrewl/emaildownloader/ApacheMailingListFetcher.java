@@ -87,12 +87,13 @@ public class ApacheMailingListFetcher implements MailingListFetcher {
                 lastRequestTimestamp = Instant.now();
                 Path file = fetch(dir, domain, listName, currentPeriod);
                 long delay = Duration.between(lastRequestTimestamp, Instant.now()).toMillis();
-                if (Files.size(file) < 1) {
+                long size = Files.size(file);
+                if (size < 1) {
                     messageConsumer.accept("No emails were obtained from this period.");
                     emptyFileCount++;
                     Files.deleteIfExists(file);
                 } else {
-                    messageConsumer.accept("Successfully downloaded emails to %s in %d ms.".formatted(file, delay));
+                    messageConsumer.accept("Successfully downloaded %.1f KB of emails to %s in %d ms.".formatted(size / 1024f, file, delay));
                     emptyFileCount = 0;
                     files.add(file);
                 }
