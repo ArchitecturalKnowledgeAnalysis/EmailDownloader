@@ -1,4 +1,4 @@
-package nl.andrewl.apache_email_downloader;
+package nl.andrewl.emaildownloader;
 
 import java.nio.file.Path;
 import java.time.Instant;

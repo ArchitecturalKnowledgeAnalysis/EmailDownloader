@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nl.andrewl</groupId>
-    <artifactId>apache-email-downloader</artifactId>
+    <artifactId>emaildownloader</artifactId>
     <version>1.1.0-SNAPSHOT</version>
 
     <properties>
@@ -22,6 +22,15 @@
         </dependency>
     </dependencies>
 
+    <!-- Setup for deploying to GitHub packages with mvn deploy. -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>Github ArchitecturalKnowledgeAnalysis Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ArchitecturalKnowledgeAnalysis/EmailDownloader</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -31,7 +40,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>nl.andrewl.apache_email_downloader.EmailDownloaderCommand</mainClass>
+                            <mainClass>nl.andrewl.emaildownloader.EmailDownloaderCommand</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

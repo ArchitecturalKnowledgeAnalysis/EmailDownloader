@@ -1,11 +1,10 @@
-package nl.andrewl.apache_email_downloader;
+package nl.andrewl.emaildownloader;
 
 import picocli.CommandLine;
 
 import java.nio.file.Path;
 import java.time.YearMonth;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 /**
  * The command-line interface to the mailing list downloader.

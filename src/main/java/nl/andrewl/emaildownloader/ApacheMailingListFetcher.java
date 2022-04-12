@@ -1,4 +1,4 @@
-package nl.andrewl.apache_email_downloader;
+package nl.andrewl.emaildownloader;
 
 import java.io.IOException;
 import java.net.URI;
