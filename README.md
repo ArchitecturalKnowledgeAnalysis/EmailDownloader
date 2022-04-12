@@ -1,9 +1,9 @@
-# ApacheEmailDownloader
-Program which automatically downloads email archives from lists.apache.org
+# EmailDownloader
+Library for downloading email archives various sources.
 
 This program can be run as a simple command-line utility, using Java 17 or higher.
 
-For an explanation of the available runtime options, run `java -jar ApacheEmailDownloader.jar --help`.
+For an explanation of the available runtime options, run `java -jar EmailDownloader.jar --help`.
 
 ## Add this dependency to your project
 First add the **jitpack.io** repository.

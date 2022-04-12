@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Generic interface for any component that can fetch email data from somewhere
@@ -20,16 +21,28 @@ public interface MailingListFetcher {
      * @param listName The name of the mailing list.
      * @param start The earliest time to fetch emails from.
      * @param end The latest time to fetch emails from.
+     * @param messageConsumer A consumer for any messages emitted by the download process.
      * @return A future that completes when the download is complete.
      */
-    CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, ZonedDateTime start, ZonedDateTime end);
+    CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, ZonedDateTime start, ZonedDateTime end, Consumer<String> messageConsumer);
 
+    default CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, ZonedDateTime start, ZonedDateTime end) {
+        return download(dir, domain, listName, start, end, s -> {});
+    }
+
+    default CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, ZonedDateTime start, Consumer<String> messageConsumer) {
+        return download(dir, domain, listName, start, ZonedDateTime.now(), messageConsumer);
+    }
     default CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, ZonedDateTime start) {
-        return download(dir, domain, listName, start, ZonedDateTime.now());
+        return download(dir, domain, listName, start, ZonedDateTime.now(), s -> {});
+    }
+
+    default CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName, Consumer<String> messageConsumer) {
+        return download(dir, domain, listName, epochStart(), messageConsumer);
     }
 
     default CompletableFuture<Collection<Path>> download(Path dir, String domain, String listName) {
-        return download(dir, domain, listName, epochStart());
+        return download(dir, domain, listName, epochStart(), s -> {});
     }
 
     /**
