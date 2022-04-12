@@ -1,5 +1,6 @@
 package nl.andrewl.apache_email_downloader;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.YearMonth;
@@ -14,6 +15,8 @@ import java.util.concurrent.ForkJoinPool;
  * mailing list from an apache email archive, to a directory.
  */
 public class ApacheMailingListDownloader {
+	private static final String API_URL = "https://lists.apache.org/api/mbox.lua";
+
 	private final String domain;
 	private final String list;
 	private final MboxDownloader downloader;
@@ -84,5 +87,9 @@ public class ApacheMailingListDownloader {
 			}
 		});
 		return cf;
+	}
+
+	private URI buildURI(String domain, String list, YearMonth period) {
+		return URI.create(API_URL + "?domain=" + domain + "&list=" + list + "&d=" + period);
 	}
 }

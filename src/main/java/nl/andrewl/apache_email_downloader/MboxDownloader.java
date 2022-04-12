@@ -8,6 +8,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.YearMonth;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Simple component that downloads a month of emails in Mbox format from the
@@ -32,18 +33,13 @@ public class MboxDownloader {
 	 * @param list The name of the mailing list to download from.
 	 * @param file The file to place downloaded content in.
 	 * @param period The period to download emails for.
-	 * @throws IOException If an error occurs when downloading the emails.
-	 * @throws InterruptedException If the process is interrupted while waiting
-	 * for the download to complete.
+	 * @return A future that completes when the request is complete.
 	 */
-	public void downloadMboxToFile(String domain, String list, Path file, YearMonth period) throws IOException, InterruptedException {
+	public CompletableFuture<HttpResponse<Path>> downloadMboxToFile(String domain, String list, Path file, YearMonth period) {
 		HttpRequest request = HttpRequest.newBuilder(URI.create(BASE_URL + "?domain=" + domain + "&list=" + list + "&d=" + period))
 				.GET()
 				.timeout(Duration.ofSeconds(5))
 				.build();
-		HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(file));
-		if (response.statusCode() >= 400) {
-			throw new IllegalStateException("Error response code: " + response.statusCode());
-		}
+		return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofFile(file));
 	}
 }
