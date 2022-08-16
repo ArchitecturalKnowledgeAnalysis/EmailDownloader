@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 
 /**
@@ -23,11 +22,17 @@ import java.util.function.Consumer;
  * mailing list archives.
  */
 public class ApacheMailingListFetcher implements MailingListFetcher {
-    private static final String API_URL = "https://lists.apache.org/api/mbox.lua";
-    private static final int MAX_CONSECUTIVE_EMPTY_FILES = 10;
-    private static final int REQUEST_INTERVAL = 1000;
+    private final String apiUrl;
+    private final int maxConsecutiveFailures;
+    private final int requestInterval;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    public ApacheMailingListFetcher(int maxConsecutiveFailures, int requestInterval, String apiUrl) {
+        this.maxConsecutiveFailures = maxConsecutiveFailures;
+        this.requestInterval = requestInterval;
+        this.apiUrl = apiUrl;
+    }
 
     @Override
     public CompletableFuture<Collection<Path>> download(
@@ -40,11 +45,7 @@ public class ApacheMailingListFetcher implements MailingListFetcher {
     ) {
         final YearMonth firstPeriod = YearMonth.from(start);
         final YearMonth lastPeriod = YearMonth.from(end);
-        final CompletableFuture<Collection<Path>> cf = new CompletableFuture<>();
-        ForkJoinPool.commonPool().submit(() -> {
-            cf.complete(fetchAll(firstPeriod, lastPeriod, dir, domain, listName, messageConsumer));
-        });
-        return cf;
+        return CompletableFuture.supplyAsync(() -> fetchAll(firstPeriod, lastPeriod, dir, domain, listName, messageConsumer));
     }
 
     /**
@@ -75,12 +76,12 @@ public class ApacheMailingListFetcher implements MailingListFetcher {
         int emptyFileCount = 0;
         Instant lastRequestTimestamp = null;
         List<Path> files = new ArrayList<>();
-        while (!currentPeriod.isBefore(firstPeriod) && emptyFileCount < MAX_CONSECUTIVE_EMPTY_FILES) {
+        while (!currentPeriod.isBefore(firstPeriod) && emptyFileCount < maxConsecutiveFailures) {
             try {
                 if (lastRequestTimestamp != null) {
                     long millisSinceLastRequest = Duration.between(lastRequestTimestamp, Instant.now()).toMillis();
-                    if (millisSinceLastRequest < REQUEST_INTERVAL) {
-                        Thread.sleep(REQUEST_INTERVAL - millisSinceLastRequest);
+                    if (millisSinceLastRequest < requestInterval) {
+                        Thread.sleep(requestInterval - millisSinceLastRequest);
                     }
                 }
                 messageConsumer.accept("Fetching emails from %s@%s in period %s...".formatted(listName, domain, currentPeriod));
@@ -123,6 +124,6 @@ public class ApacheMailingListFetcher implements MailingListFetcher {
     }
 
     private URI buildURI(String domain, String list, YearMonth period) {
-        return URI.create(API_URL + "?domain=" + domain + "&list=" + list + "&d=" + period);
+        return URI.create(apiUrl + "?domain=" + domain + "&list=" + list + "&d=" + period);
     }
 }
